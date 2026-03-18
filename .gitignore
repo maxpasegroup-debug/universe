@@ -1,0 +1,22 @@
+node_modules/
+client/node_modules/
+server/node_modules/
+
+.next/
+
+# env files
+.env
+.env.*
+client/.env
+client/.env.*
+server/.env
+server/.env.*
+
+# local server uploads (host static files from Railway; not required in git)
+server/uploads/
+uploads/
+
+# cursor / editor artifacts
+.cursor/
+.vscode/
+
