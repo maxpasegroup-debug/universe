@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/api";
 import { getToken } from "./authStorage";
 
 export class ApiError extends Error {
@@ -11,7 +12,7 @@ export class ApiError extends Error {
 }
 
 function resolveApiBase(): string {
-  let base = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  let base = (API_URL || "").replace(/\/$/, "");
   if (
     typeof window !== "undefined" &&
     process.env.NODE_ENV === "production" &&
@@ -31,32 +32,18 @@ function headersWithAuth(token: string | null) {
   return headers;
 }
 
-async function parseJsonResponse<T>(res: Response): Promise<T> {
-  const text = await res.text();
-  let data: unknown = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-  if (!res.ok) {
-    const message =
-      (data as { message?: string } | null)?.message ||
-      `Request failed with status ${res.status}`;
-    throw new ApiError(res.status, message, data);
-  }
-  return data as T;
+function authBase(): string {
+  return (API_URL || "").replace(/\/$/, "");
 }
 
 export async function authLogin(body: {
   mobile: string;
   password: string;
 }): Promise<{ token: string }> {
-  console.log("API:", process.env.NEXT_PUBLIC_API_URL);
+  console.log("API:", API_URL);
   let res: Response;
   try {
-    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+    res = await fetch(`${authBase()}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -67,17 +54,25 @@ export async function authLogin(body: {
     console.error(err);
     throw err;
   }
-  return parseJsonResponse<{ token: string }>(res);
+  if (!res.ok) {
+    throw new Error("Server not reachable");
+  }
+  try {
+    return (await res.json()) as { token: string };
+  } catch (err) {
+    console.error(err);
+    throw new Error("Server not reachable");
+  }
 }
 
 export async function authRegister(body: {
   mobile: string;
   password: string;
 }): Promise<{ token: string }> {
-  console.log("API:", process.env.NEXT_PUBLIC_API_URL);
+  console.log("API:", API_URL);
   let res: Response;
   try {
-    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+    res = await fetch(`${authBase()}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -88,7 +83,15 @@ export async function authRegister(body: {
     console.error(err);
     throw err;
   }
-  return parseJsonResponse<{ token: string }>(res);
+  if (!res.ok) {
+    throw new Error("Server not reachable");
+  }
+  try {
+    return (await res.json()) as { token: string };
+  } catch (err) {
+    console.error(err);
+    throw new Error("Server not reachable");
+  }
 }
 
 export async function apiFetch<T = unknown>(
@@ -100,7 +103,7 @@ export async function apiFetch<T = unknown>(
     headers?: Record<string, string>;
   }
 ): Promise<T> {
-  console.log("API:", process.env.NEXT_PUBLIC_API_URL);
+  console.log("API:", API_URL);
 
   const token = options?.token ?? getToken();
   const base = resolveApiBase();

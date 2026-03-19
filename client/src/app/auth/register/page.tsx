@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { authRegister, ApiError } from "@/lib/api";
+import { authRegister } from "@/lib/api";
 import { setToken } from "@/lib/authStorage";
 
 export default function RegisterPage() {
@@ -26,11 +26,11 @@ export default function RegisterPage() {
 
       router.push("/dashboard");
     } catch (err: unknown) {
-      if (err instanceof ApiError) {
-        setError(err.message || "Registration failed");
+      if (err instanceof Error && err.message === "Server not reachable") {
+        setError("Server not reachable");
       } else {
         console.error(err);
-        alert("Server not reachable");
+        setError("Server not reachable");
       }
     } finally {
       setLoading(false);
@@ -93,4 +93,3 @@ export default function RegisterPage() {
     </AuthShell>
   );
 }
-
