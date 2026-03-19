@@ -6,11 +6,12 @@ require("dotenv").config();
 
 const {
   PORT = 5000,
+  MONGO_URI,
   MONGODB_URI,
 } = process.env;
 
 const resolvedMongo =
-  MONGODB_URI || "mongodb://localhost:27017/7universe";
+  MONGO_URI || MONGODB_URI || "mongodb://localhost:27017/7universe";
 const resolvedJwtSecret =
   process.env.JWT_SECRET || "change-me";
 process.env.JWT_SECRET = resolvedJwtSecret;
