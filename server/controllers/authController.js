@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const User = require("../models/User");
 
 function signToken(user) {
@@ -22,8 +23,16 @@ function normalizeMobile(mobile) {
   return String(mobile || "").trim();
 }
 
+function isDbReady() {
+  return mongoose.connection.readyState === 1;
+}
+
 async function register(req, res, next) {
   try {
+    if (!isDbReady()) {
+      return res.status(503).json({ message: "Database unavailable. Try again." });
+    }
+
     const mobile = normalizeMobile(req.body.mobile);
     const password = String(req.body.password || "");
 
@@ -55,6 +64,10 @@ async function register(req, res, next) {
 
 async function login(req, res, next) {
   try {
+    if (!isDbReady()) {
+      return res.status(503).json({ message: "Database unavailable. Try again." });
+    }
+
     const mobile = normalizeMobile(req.body.mobile);
     const password = String(req.body.password || "");
 
@@ -77,6 +90,10 @@ async function login(req, res, next) {
 
 async function me(req, res, next) {
   try {
+    if (!isDbReady()) {
+      return res.status(503).json({ message: "Database unavailable. Try again." });
+    }
+
     const userId = req.user?.userId;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
     const user = await User.findById(userId).select("_id mobile role");

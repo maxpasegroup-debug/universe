@@ -5,6 +5,8 @@ const BACKEND_API_URL = (
 ).replace(/\/$/, "");
 
 export async function POST(request: Request) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
     const body = await request.text();
     const upstream = await fetch(`${BACKEND_API_URL}/auth/register`, {
@@ -14,6 +16,7 @@ export async function POST(request: Request) {
       },
       body,
       cache: "no-store",
+      signal: controller.signal,
     });
 
     const text = await upstream.text();
@@ -26,5 +29,7 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: "Server not reachable" }, { status: 503 });
+  } finally {
+    clearTimeout(timeout);
   }
 }
