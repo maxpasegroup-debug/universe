@@ -2,6 +2,14 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION:", err);
+});
+
 const path = require("path");
 const authRoutes = require("./routes/authRoutes");
 const { router: apiRouter } = require("./routes");
@@ -19,6 +27,18 @@ app.use(
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log("Incoming:", req.method, req.url);
+  next();
+});
+
+app.post("/api/debug", (req, res) => {
+  return res.json({
+    success: true,
+    body: req.body,
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("Backend running");
 });
@@ -32,8 +52,8 @@ app.get("/health", (req, res) => res.status(200).json({ ok: true }));
 const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
-app.use("/api/auth", authRoutes);
-app.use("/api", apiRouter);
+// app.use("/api/auth", authRoutes);
+// app.use("/api", apiRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
