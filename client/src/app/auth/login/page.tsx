@@ -29,20 +29,30 @@ export default function LoginPage() {
         },
         body: JSON.stringify(data),
       });
-      if (!response.ok) {
-        throw new Error("Server not reachable");
+      const text = await response.text();
+      let payload: { token?: string; message?: string } = {};
+      try {
+        payload = text ? (JSON.parse(text) as { token?: string; message?: string }) : {};
+      } catch {
+        payload = {};
       }
-      const json = (await response.json()) as { token: string };
-      setToken(json.token);
+      if (!response.ok) {
+        setError(
+          payload.message ||
+            (response.status === 404 ? "Server not reachable" : "Invalid credentials")
+        );
+        return;
+      }
+      if (!payload.token) {
+        setError("Server not reachable");
+        return;
+      }
+      setToken(payload.token);
 
       router.push("/dashboard");
     } catch (err: unknown) {
-      if (err instanceof Error && err.message === "Server not reachable") {
-        setError("Server not reachable");
-      } else {
-        console.error(err);
-        setError("Server not reachable");
-      }
+      console.error(err);
+      setError(err instanceof TypeError ? "Server not reachable" : "Server not reachable");
     } finally {
       setLoading(false);
     }
