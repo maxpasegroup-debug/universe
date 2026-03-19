@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
 import { setToken } from "@/lib/authStorage";
 
 export default function RegisterPage() {
@@ -28,8 +28,13 @@ export default function RegisterPage() {
       setToken(data.token);
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err?.message || "Registration failed");
+    } catch (err: unknown) {
+      if (err instanceof ApiError) {
+        setError(err.message || "Registration failed");
+      } else {
+        console.error(err);
+        alert("Server not reachable");
+      }
     } finally {
       setLoading(false);
     }

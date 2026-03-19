@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
 import { setToken } from "@/lib/authStorage";
 
 export default function LoginPage() {
@@ -28,8 +28,13 @@ export default function LoginPage() {
       setToken(data.token);
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError("Invalid credentials");
+    } catch (err: unknown) {
+      if (err instanceof ApiError) {
+        setError("Invalid credentials");
+      } else {
+        console.error(err);
+        alert("Server not reachable");
+      }
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,3 @@
-import { API_URL } from "./apiConfig";
 import { getToken } from "./authStorage";
 
 export class ApiError extends Error {
@@ -11,8 +10,23 @@ export class ApiError extends Error {
   }
 }
 
+function resolveApiBase(): string {
+  let base = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  if (
+    typeof window !== "undefined" &&
+    process.env.NODE_ENV === "production" &&
+    base.startsWith("http://") &&
+    !/localhost|127\.0\.0\.1/i.test(base)
+  ) {
+    base = `https://${base.slice("http://".length)}`;
+  }
+  return base;
+}
+
 function headersWithAuth(token: string | null) {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }
@@ -26,8 +40,13 @@ export async function apiFetch<T = unknown>(
     headers?: Record<string, string>;
   }
 ): Promise<T> {
+  console.log(process.env.NEXT_PUBLIC_API_URL);
+
   const token = options?.token ?? getToken();
-  const url = `${API_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+  const base = resolveApiBase();
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = `${base}${path}`;
+
   const headers: Record<string, string> = {
     ...headersWithAuth(token),
     ...(options?.headers || {}),
@@ -43,19 +62,41 @@ export async function apiFetch<T = unknown>(
       headers["Content-Type"] = "application/json";
       fetchOptions.body = JSON.stringify(options.body);
     } else {
+      delete headers["Content-Type"];
       fetchOptions.body = options.body;
     }
   }
 
-  const res = await fetch(url, fetchOptions);
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  let res: Response;
+  try {
+    res = await fetch(url, fetchOptions);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+
+  let text: string;
+  try {
+    text = await res.text();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+
+  let data: unknown = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 
   if (!res.ok) {
-    const message = data?.message || `Request failed with status ${res.status}`;
+    const message =
+      (data as { message?: string } | null)?.message ||
+      `Request failed with status ${res.status}`;
     throw new ApiError(res.status, message, data);
   }
 
   return data as T;
 }
-
