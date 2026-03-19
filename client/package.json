@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
     "framer-motion": "^12.38.0",
@@ -23,5 +22,8 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
