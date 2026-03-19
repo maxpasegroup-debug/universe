@@ -3,27 +3,29 @@ const { seedAdminUser } = require("./seedAdmin");
 
 require("dotenv").config();
 
-const { MONGO_URI, MONGODB_URI } = process.env;
-
-const resolvedMongo =
-  MONGO_URI || MONGODB_URI || "mongodb://localhost:27017/7universe";
-
 if (!process.env.JWT_SECRET) {
   process.env.JWT_SECRET = "change-me";
 }
 
-async function start() {
-  await mongoose.connect(resolvedMongo, {
-    autoIndex: true,
-  });
+require("./server");
 
-  await seedAdminUser();
+const { MONGO_URI, MONGODB_URI } = process.env;
+const resolvedMongo =
+  MONGO_URI || MONGODB_URI || "mongodb://localhost:27017/7universe";
 
-  require("./server");
+async function initDatabase() {
+  try {
+    await mongoose.connect(resolvedMongo, {
+      autoIndex: true,
+      serverSelectionTimeoutMS: 10000,
+    });
+    await seedAdminUser();
+    // eslint-disable-next-line no-console
+    console.log("MongoDB connected");
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("MongoDB init failed:", err?.message || err);
+  }
 }
 
-start().catch((err) => {
-  // eslint-disable-next-line no-console
-  console.error("Failed to start server:", err);
-  process.exit(1);
-});
+initDatabase();
