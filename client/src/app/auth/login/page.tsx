@@ -30,6 +30,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data?.success || data?.message) {
+        localStorage.setItem("isLoggedIn", "true");
         window.location.href = "/dashboard";
       } else {
         setError("Login failed");

@@ -11,8 +11,15 @@ export default function DashboardHomePage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      if (!isLoggedIn) {
+        router.push("/auth/login");
+        return;
+      }
+    }
     void logAnalytics("dashboard_home_view");
-  }, []);
+  }, [router]);
 
   return (
     <div className="space-y-6">
@@ -55,7 +62,18 @@ export default function DashboardHomePage() {
           </motion.div>
         ))}
       </div>
+
+      <button
+        onClick={() => {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("isLoggedIn");
+            window.location.href = "/auth/login";
+          }
+        }}
+        className="mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white/90 hover:bg-white/10 transition-colors"
+      >
+        Logout
+      </button>
     </div>
   );
 }
-
