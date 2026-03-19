@@ -5,7 +5,6 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { API_URL } from "@/config/api";
 import { setToken } from "@/lib/authStorage";
 
 export default function RegisterPage() {
@@ -22,7 +21,7 @@ export default function RegisterPage() {
     setError(null);
     try {
       const data = { mobile, password };
-      const endpoint = `${API_URL}/auth/register`;
+      const endpoint = "/api/auth/register";
       console.log("Register API:", endpoint);
       const response = await fetch(endpoint, {
         method: "POST",
