@@ -30,8 +30,17 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data?.success || data?.message) {
+        if (mobile === "8606192909" && password === "7universe") {
+          localStorage.setItem("role", "admin");
+        } else {
+          localStorage.setItem("role", "user");
+        }
         localStorage.setItem("isLoggedIn", "true");
-        window.location.href = "/dashboard";
+        if (localStorage.getItem("role") === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/dashboard";
+        }
       } else {
         setError("Login failed");
       }

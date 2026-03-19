@@ -31,6 +31,7 @@ export default function RegisterPage() {
 
       if (data?.success || data?.message) {
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("role", "user");
         window.location.href = "/dashboard";
       } else {
         setError("Registration failed");
