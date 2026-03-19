@@ -22,7 +22,9 @@ export default function LoginPage() {
     setError(null);
     try {
       const data = { mobile, password };
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const endpoint = `${API_URL}/auth/login`;
+      console.log("Login API:", endpoint);
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,3 +116,4 @@ export default function LoginPage() {
     </AuthShell>
   );
 }
+
