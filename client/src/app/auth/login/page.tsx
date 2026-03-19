@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { API } from "../../utils/api";
+import { API } from "@/utils/api";
 
 export default function LoginPage() {
   const router = useRouter();
