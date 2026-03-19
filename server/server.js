@@ -65,7 +65,7 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
   // eslint-disable-next-line no-console
-  console.log(`Server running on port ${PORT}`);
+  console.log("Server running on port " + PORT);
 });
 
 module.exports = app;
