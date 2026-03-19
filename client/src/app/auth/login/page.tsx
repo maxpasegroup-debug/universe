@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { setToken } from "@/lib/authStorage";
+import { API } from "../../utils/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,37 +20,20 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = { mobile, password };
-      const endpoint = "/api/auth/login";
-      console.log("Login API:", endpoint);
-      const response = await fetch(endpoint, {
+      const res = await fetch(`${API}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ mobile, password }),
       });
-      const text = await response.text();
-      let payload: { token?: string; message?: string } = {};
-      try {
-        payload = text ? (JSON.parse(text) as { token?: string; message?: string }) : {};
-      } catch {
-        payload = {};
-      }
-      if (!response.ok) {
-        setError(
-          payload.message ||
-            (response.status === 404 ? "Server not reachable" : "Invalid credentials")
-        );
-        return;
-      }
-      if (!payload.token) {
-        setError("Server not reachable");
-        return;
-      }
-      setToken(payload.token);
+      const data = await res.json();
 
-      router.push("/dashboard");
+      if (data?.success || data?.message) {
+        window.location.href = "/dashboard";
+      } else {
+        setError("Login failed");
+      }
     } catch (err: unknown) {
       console.error(err);
       setError(err instanceof TypeError ? "Server not reachable" : "Server not reachable");
