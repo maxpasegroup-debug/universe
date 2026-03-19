@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import StarBackground from "../StarBackground";
 import Sidebar, { SidebarItem } from "./Sidebar";
-import { clearToken, getToken } from "@/lib/authStorage";
-import { decodeJwt } from "@/lib/jwt";
+import { clearToken } from "@/lib/authStorage";
 
 export default function DashboardShell({
   title,
@@ -23,20 +22,7 @@ export default function DashboardShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const decoded = decodeJwt(token);
-    if (!decoded) {
-      clearToken();
-      router.replace("/login");
-      return;
-    }
-    if (requireRole && decoded.role !== requireRole) {
-      router.replace(decoded.role === "admin" ? "/admin" : "/dashboard");
-    }
+    if (!requireRole) return;
   }, [router, requireRole]);
 
   const sidebarPanel = (
@@ -74,7 +60,8 @@ export default function DashboardShell({
             className="hidden sm:inline-flex rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white/80 hover:bg-white/10 transition-colors"
             onClick={() => {
               clearToken();
-              router.replace("/login");
+              localStorage.removeItem("isLoggedIn");
+              window.location.href = "/login";
             }}
           >
             Logout
