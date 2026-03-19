@@ -5,9 +5,14 @@ import { motion } from "framer-motion";
 import StarBackground from "@/components/StarBackground";
 import GlassCard from "@/components/ui/GlassCard";
 import GoldButton from "@/components/ui/GoldButton";
+import { getToken } from "@/lib/authStorage";
 
 export default function Home() {
   const router = useRouter();
+
+  function isLoggedIn() {
+    return !!getToken();
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-royal-100">
@@ -48,14 +53,19 @@ export default function Home() {
               {
                 title: "Learn",
                 desc: "Watch videos, listen to audios and read documents to understand the business.",
+                onClick: () => router.push(isLoggedIn() ? "/dashboard" : "/login"),
               },
               {
                 title: "Earn",
                 desc: "Follow the step-by-step guide to start earning using the referral system.",
+                onClick: () => router.push(isLoggedIn() ? "/dashboard" : "/login"),
               },
               {
                 title: "Talk to an Expert",
                 desc: "Connect directly with the owner to get guidance and support.",
+                onClick: () => {
+                  window.location.href = "https://wa.me/917591929909";
+                },
               },
             ].map((card, idx) => (
               <motion.div
@@ -69,6 +79,22 @@ export default function Home() {
                     {card.title}
                   </div>
                   <p className="mt-3 text-[#B8B8B8] leading-relaxed">{card.desc}</p>
+                  <div className="mt-6">
+                    {card.title === "Talk to an Expert" ? (
+                      <GoldButton
+                        className="w-full"
+                        glow
+                        onClick={card.onClick}
+                        aria-label="Chat on WhatsApp"
+                      >
+                        CHAT ON WHATSAPP
+                      </GoldButton>
+                    ) : (
+                      <GoldButton className="w-full" glow onClick={card.onClick}>
+                        {card.title.toUpperCase()}
+                      </GoldButton>
+                    )}
+                  </div>
                 </GlassCard>
               </motion.div>
             ))}
@@ -81,11 +107,11 @@ export default function Home() {
             transition={{ duration: 0.55, delay: 0.25 }}
           >
             <GoldButton
-              onClick={() => router.push("/auth/login")}
+              onClick={() => router.push("/register")}
               glow
               className="px-12 py-5 text-lg font-semibold"
             >
-              CONNECT ACCOUNT
+              REGISTER NOW
             </GoldButton>
           </motion.div>
         </div>
