@@ -7,7 +7,6 @@ import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/authStorage";
-import { decodeJwt } from "@/lib/jwt";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,10 +27,9 @@ export default function LoginPage() {
       });
       setToken(data.token);
 
-      const decoded = decodeJwt(data.token);
-      router.push(decoded?.role === "admin" ? "/admin" : "/dashboard");
+      router.push("/dashboard");
     } catch (err: any) {
-      setError(err?.message || "Login failed");
+      setError("Invalid credentials");
     } finally {
       setLoading(false);
     }

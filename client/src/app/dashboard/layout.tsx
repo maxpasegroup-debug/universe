@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <DashboardShell title="Dashboard" sidebarItems={items} requireRole="user">
+    <DashboardShell title="Dashboard" sidebarItems={items}>
       {children}
     </DashboardShell>
   );

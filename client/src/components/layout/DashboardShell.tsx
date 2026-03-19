@@ -25,13 +25,13 @@ export default function DashboardShell({
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      router.replace("/auth/login");
+      router.replace("/login");
       return;
     }
     const decoded = decodeJwt(token);
     if (!decoded) {
       clearToken();
-      router.replace("/auth/login");
+      router.replace("/login");
       return;
     }
     if (requireRole && decoded.role !== requireRole) {
@@ -74,7 +74,7 @@ export default function DashboardShell({
             className="hidden sm:inline-flex rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white/80 hover:bg-white/10 transition-colors"
             onClick={() => {
               clearToken();
-              router.replace("/auth/login");
+              router.replace("/login");
             }}
           >
             Logout
