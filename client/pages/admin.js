@@ -11,43 +11,58 @@ export default function Admin() {
     }
   }, []);
 
-  const cardStyle = {
-    border: "1px solid #ddd",
-    borderRadius: "12px",
+  const card = {
+    background: "#111",
+    border: "1px solid #222",
+    borderRadius: "16px",
     padding: "20px",
     marginBottom: "20px",
     cursor: "pointer",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-    textAlign: "center",
+    boxShadow: "0 0 20px rgba(255,215,0,0.1)",
+    transition: "0.3s",
   };
 
   return (
-    <div style={{ padding: 20, maxWidth: 500, margin: "auto" }}>
-      <h1 style={{ textAlign: "center" }}>?? Admin Panel</h1>
+    <div
+      style={{
+        background: "#000",
+        minHeight: "100vh",
+        padding: "20px",
+        color: "#fff",
+      }}
+    >
+      <h1
+        style={{
+          textAlign: "center",
+          color: "#FFD700",
+          marginBottom: "30px",
+        }}
+      >
+        ?? Admin Control Panel
+      </h1>
 
-      <div style={cardStyle} onClick={() => router.push("/admin/learn")}>
-        <h2>?? Manage Learn</h2>
+      <div style={card} onClick={() => router.push("/admin/learn")}>
+        <h2 style={{ color: "#FFD700" }}>?? Manage Learn</h2>
         <p>Upload PDFs, videos & audio</p>
       </div>
 
-      <div style={cardStyle} onClick={() => router.push("/admin/earn")}>
-        <h2>?? Manage Earn</h2>
+      <div style={card} onClick={() => router.push("/admin/earn")}>
+        <h2 style={{ color: "#FFD700" }}>?? Manage Earn</h2>
         <p>Add links, videos & audio</p>
       </div>
 
-      <div style={cardStyle} onClick={() => window.open("https://wa.me/917591929909")}>
-        <h2>?? Talk to Expert</h2>
-        <p>Connect via WhatsApp</p>
+      <div style={card} onClick={() => window.open("https://wa.me/917591929909")}> 
+        <h2 style={{ color: "#FFD700" }}>?? Talk to Expert</h2>
       </div>
 
       <div
-        style={{ ...cardStyle, background: "#ffe5e5" }}
+        style={{ ...card, background: "#220000" }}
         onClick={() => {
           localStorage.clear();
           window.location.href = "/login";
         }}
       >
-        <h2>?? Logout</h2>
+        <h2 style={{ color: "#ff4d4d" }}>?? Logout</h2>
       </div>
     </div>
   );

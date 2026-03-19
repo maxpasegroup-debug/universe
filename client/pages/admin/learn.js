@@ -1,60 +1,85 @@
 import { useState, useEffect } from "react";
-import { saveData, getData } from "../../src/utils/storage";
 
-export default function ManageLearn() {
+export default function Learn() {
   const [file, setFile] = useState(null);
   const [category, setCategory] = useState("");
   const [items, setItems] = useState([]);
 
-  useEffect(() => {
-    setItems(getData("learn"));
-  }, []);
-
-  const handleUpload = () => {
+  const upload = async () => {
     if (!file || !category) return alert("Fill all fields");
 
-    const newItem = {
-      name: file.name,
-      category,
-    };
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category", category);
 
-    const updated = [...items, newItem];
-    setItems(updated);
-    saveData("learn", updated);
+    await fetch("/api/upload/learn", {
+      method: "POST",
+      body: formData,
+    });
 
-    setFile(null);
-    setCategory("");
+    alert("Uploaded");
+    fetchItems();
   };
 
+  const fetchItems = async () => {
+    const res = await fetch("/api/learn");
+    const data = await res.json();
+    setItems(data);
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Upload Learn Content</h2>
+    <div
+      style={{
+        background: "#000",
+        minHeight: "100vh",
+        padding: "20px",
+        color: "#fff",
+      }}
+    >
+      <h1 style={{ color: "#FFD700" }}>?? Learn Manager</h1>
 
-      <input
-        placeholder="Enter category (Eg: Step 1)"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-      />
+      <div style={{ marginBottom: 20 }}>
+        <input
+          placeholder="Category (Eg: Step 1)"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          style={{ padding: 10, marginRight: 10 }}
+        />
 
-      <br />
-      <br />
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
 
-      <input
-        type="file"
-        accept=".pdf,audio/*,video/*"
-        onChange={(e) => setFile(e.target.files[0])}
-      />
+        <button
+          onClick={upload}
+          style={{
+            marginLeft: 10,
+            background: "#FFD700",
+            border: "none",
+            padding: "10px 20px",
+            cursor: "pointer",
+          }}
+        >
+          Upload
+        </button>
+      </div>
 
-      <br />
-      <br />
-
-      <button onClick={handleUpload}>Upload</button>
-
-      <h3>Uploaded Content</h3>
+      <h2>Uploaded Content</h2>
 
       {items.map((item, i) => (
-        <div key={i}>
-          <strong>{item.category}</strong> - {item.name}
+        <div
+          key={i}
+          style={{
+            background: "#111",
+            padding: 15,
+            marginBottom: 10,
+            borderRadius: 10,
+          }}
+        >
+          <strong style={{ color: "#FFD700" }}>{item.category}</strong>
+          <p>{item.file}</p>
         </div>
       ))}
     </div>
