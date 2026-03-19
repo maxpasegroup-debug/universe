@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
 
 const BACKEND_API_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "https://universe-production-74d9.up.railway.app/api"
+  process.env.BACKEND_API_URL || "https://universe-production-74d9.up.railway.app/api"
 ).replace(/\/$/, "");
 
 export async function POST(request: Request) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
+    const host = request.headers.get("host") || "";
+    if (host && BACKEND_API_URL.includes(host)) {
+      return NextResponse.json(
+        { message: "Backend URL is misconfigured" },
+        { status: 500 }
+      );
+    }
+
     const body = await request.text();
     const upstream = await fetch(`${BACKEND_API_URL}/auth/login`, {
       method: "POST",
