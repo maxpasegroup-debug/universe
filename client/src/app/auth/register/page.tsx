@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,14 +56,24 @@ export default function RegisterPage() {
         </div>
         <div>
           <label className="text-white/80 text-sm font-medium">Password</label>
-          <TextInput
-            type="password"
-            placeholder="Choose a strong password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
-            required
-          />
+          <div className="relative">
+            <TextInput
+              type={showPassword ? "text" : "password"}
+              placeholder="Choose a strong password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              required
+              className="pr-28"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl border border-gold-300/30 bg-white/5 px-3 py-2 text-white/80 hover:bg-white/10 transition-colors text-xs"
+            >
+              {showPassword ? "HIDE" : "SHOW"}
+            </button>
+          </div>
         </div>
 
         {error ? <div className="text-red-300 bg-red-500/10 border border-red-300/20 rounded-xl p-3">{error}</div> : null}
