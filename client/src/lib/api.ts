@@ -31,6 +31,66 @@ function headersWithAuth(token: string | null) {
   return headers;
 }
 
+async function parseJsonResponse<T>(res: Response): Promise<T> {
+  const text = await res.text();
+  let data: unknown = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+  if (!res.ok) {
+    const message =
+      (data as { message?: string } | null)?.message ||
+      `Request failed with status ${res.status}`;
+    throw new ApiError(res.status, message, data);
+  }
+  return data as T;
+}
+
+export async function authLogin(body: {
+  mobile: string;
+  password: string;
+}): Promise<{ token: string }> {
+  console.log("API:", process.env.NEXT_PUBLIC_API_URL);
+  let res: Response;
+  try {
+    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+  return parseJsonResponse<{ token: string }>(res);
+}
+
+export async function authRegister(body: {
+  mobile: string;
+  password: string;
+}): Promise<{ token: string }> {
+  console.log("API:", process.env.NEXT_PUBLIC_API_URL);
+  let res: Response;
+  try {
+    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+  return parseJsonResponse<{ token: string }>(res);
+}
+
 export async function apiFetch<T = unknown>(
   endpoint: string,
   options?: {
@@ -40,7 +100,7 @@ export async function apiFetch<T = unknown>(
     headers?: Record<string, string>;
   }
 ): Promise<T> {
-  console.log(process.env.NEXT_PUBLIC_API_URL);
+  console.log("API:", process.env.NEXT_PUBLIC_API_URL);
 
   const token = options?.token ?? getToken();
   const base = resolveApiBase();

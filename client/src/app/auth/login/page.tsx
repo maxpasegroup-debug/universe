@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { apiFetch, ApiError } from "@/lib/api";
+import { authLogin, ApiError } from "@/lib/api";
 import { setToken } from "@/lib/authStorage";
 
 export default function LoginPage() {
@@ -21,10 +21,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiFetch<{ token: string }>(`/auth/login`, {
-        method: "POST",
-        body: { mobile, password },
-      });
+      const data = await authLogin({ mobile, password });
       setToken(data.token);
 
       router.push("/dashboard");
