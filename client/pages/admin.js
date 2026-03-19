@@ -7,28 +7,48 @@ export default function Admin() {
   useEffect(() => {
     const role = localStorage.getItem("role");
     if (role !== "admin") {
-      window.location.href = "/login";
+      router.push("/login");
     }
   }, []);
 
+  const cardStyle = {
+    border: "1px solid #ddd",
+    borderRadius: "12px",
+    padding: "20px",
+    marginBottom: "20px",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+    textAlign: "center",
+  };
+
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Admin Panel</h1>
+    <div style={{ padding: 20, maxWidth: 500, margin: "auto" }}>
+      <h1 style={{ textAlign: "center" }}>?? Admin Panel</h1>
 
-      <button onClick={() => router.push("/admin/learn")}>Manage Learn</button>
+      <div style={cardStyle} onClick={() => router.push("/admin/learn")}>
+        <h2>?? Manage Learn</h2>
+        <p>Upload PDFs, videos & audio</p>
+      </div>
 
-      <button onClick={() => router.push("/admin/earn")}>Manage Earn</button>
+      <div style={cardStyle} onClick={() => router.push("/admin/earn")}>
+        <h2>?? Manage Earn</h2>
+        <p>Add links, videos & audio</p>
+      </div>
 
-      <button onClick={() => window.open("https://wa.me/917591929909")}>Talk to Expert</button>
+      <div style={cardStyle} onClick={() => window.open("https://wa.me/917591929909")}>
+        <h2>?? Talk to Expert</h2>
+        <p>Connect via WhatsApp</p>
+      </div>
 
-      <button
+      <div
+        style={{ ...cardStyle, background: "#ffe5e5" }}
         onClick={() => {
           localStorage.clear();
           window.location.href = "/login";
         }}
       >
-        Logout
-      </button>
+        <h2>?? Logout</h2>
+      </div>
     </div>
   );
 }
