@@ -4,11 +4,7 @@ const { seedAdminUser } = require("./seedAdmin");
 
 require("dotenv").config();
 
-const {
-  PORT = 5000,
-  MONGO_URI,
-  MONGODB_URI,
-} = process.env;
+const { MONGO_URI, MONGODB_URI } = process.env;
 
 const resolvedMongo =
   MONGO_URI || MONGODB_URI || "mongodb://localhost:27017/7universe";
@@ -23,10 +19,7 @@ async function start() {
 
   await seedAdminUser();
 
-  app.listen(PORT, () => {
-    // eslint-disable-next-line no-console
-    console.log(`7Universe API running on port ${PORT}`);
-  });
+  app.startServer();
 }
 
 start().catch((err) => {
@@ -34,4 +27,3 @@ start().catch((err) => {
   console.error("Failed to start server:", err);
   process.exit(1);
 });
-

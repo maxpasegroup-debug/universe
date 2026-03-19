@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import TextInput from "@/components/ui/TextInput";
 import GoldButton from "@/components/ui/GoldButton";
-import { authLogin } from "@/lib/api";
+import { API_URL } from "@/config/api";
 import { setToken } from "@/lib/authStorage";
 
 export default function LoginPage() {
@@ -21,8 +21,19 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await authLogin({ mobile, password });
-      setToken(data.token);
+      const data = { mobile, password };
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Server not reachable");
+      }
+      const json = (await response.json()) as { token: string };
+      setToken(json.token);
 
       router.push("/dashboard");
     } catch (err: unknown) {

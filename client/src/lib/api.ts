@@ -32,68 +32,6 @@ function headersWithAuth(token: string | null) {
   return headers;
 }
 
-function authBase(): string {
-  return (API_URL || "").replace(/\/$/, "");
-}
-
-export async function authLogin(body: {
-  mobile: string;
-  password: string;
-}): Promise<{ token: string }> {
-  console.log("API:", API_URL);
-  let res: Response;
-  try {
-    res = await fetch(`${authBase()}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-  if (!res.ok) {
-    throw new Error("Server not reachable");
-  }
-  try {
-    return (await res.json()) as { token: string };
-  } catch (err) {
-    console.error(err);
-    throw new Error("Server not reachable");
-  }
-}
-
-export async function authRegister(body: {
-  mobile: string;
-  password: string;
-}): Promise<{ token: string }> {
-  console.log("API:", API_URL);
-  let res: Response;
-  try {
-    res = await fetch(`${authBase()}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-  if (!res.ok) {
-    throw new Error("Server not reachable");
-  }
-  try {
-    return (await res.json()) as { token: string };
-  } catch (err) {
-    console.error(err);
-    throw new Error("Server not reachable");
-  }
-}
-
 export async function apiFetch<T = unknown>(
   endpoint: string,
   options?: {
