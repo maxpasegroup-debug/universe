@@ -12,18 +12,19 @@ export default function Earn() {
   const save = async () => {
     if (!category) return alert("Category required");
 
-    await fetch(`${API}/content/upload`, {
+    const formData = new FormData();
+    formData.append("category", category);
+    formData.append("type", "earn");
+    formData.append("language", language);
+    formData.append("link", link);
+
+    if (file) {
+      formData.append("file", file);
+    }
+
+    await fetch("/api/content/upload", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        category,
-        type: "earn",
-        language,
-        link: link || "",
-        file: file?.name || "",
-      }),
+      body: formData,
     });
 
     alert("Saved successfully");
@@ -135,7 +136,17 @@ export default function Earn() {
             </p>
           )}
 
-          {item.file && <p>📁 {item.file}</p>}
+          {item.file ? (
+            /^https?:\/\//i.test(item.file) ? (
+              <p>
+                <a href={item.file} target="_blank" rel="noreferrer" style={{ color: "#FFD700" }}>
+                  Open file / media
+                </a>
+              </p>
+            ) : (
+              <p>📁 {item.file}</p>
+            )
+          ) : null}
         </div>
       ))}
     </div>

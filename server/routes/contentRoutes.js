@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Content = require("../models/Content");
+const upload = require("../middleware/upload");
 
 router.get("/", async (req, res) => {
   try {
@@ -14,9 +15,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/upload", async (req, res) => {
+router.post("/upload", upload.single("file"), async (req, res) => {
   try {
-    const { category, type, language, link, file } = req.body;
+    const { category, type, language, link } = req.body;
+
+    const file = req.file ? req.file.path : null;
 
     const content = new Content({
       category,
@@ -28,7 +31,7 @@ router.post("/upload", async (req, res) => {
 
     await content.save();
 
-    res.json({ success: true });
+    res.json({ success: true, file });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

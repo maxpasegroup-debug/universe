@@ -10,20 +10,21 @@ export default function Learn() {
   const [items, setItems] = useState([]);
 
   const upload = async () => {
-    if (!file || !category) return alert("Fill all fields");
+    if (!category) return alert("Category required");
 
-    await fetch(`${API}/content/upload`, {
+    const formData = new FormData();
+    formData.append("category", category);
+    formData.append("type", "learn");
+    formData.append("language", language);
+    formData.append("link", link);
+
+    if (file) {
+      formData.append("file", file);
+    }
+
+    await fetch("/api/content/upload", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        category,
-        type: "learn",
-        language,
-        link: link || "",
-        file: file?.name || "",
-      }),
+      body: formData,
     });
 
     alert("Uploaded");
@@ -111,7 +112,17 @@ export default function Learn() {
           }}
         >
           <strong style={{ color: "#FFD700" }}>{item.category}</strong>
-          <p>{item.file}</p>
+          {item.file ? (
+            /^https?:\/\//i.test(item.file) ? (
+              <p>
+                <a href={item.file} target="_blank" rel="noreferrer" style={{ color: "#FFD700" }}>
+                  Open file / media
+                </a>
+              </p>
+            ) : (
+              <p>{item.file}</p>
+            )
+          ) : null}
           {item.link ? (
             <p>
               <a href={item.link} target="_blank" rel="noreferrer" style={{ color: "#FFD700" }}>

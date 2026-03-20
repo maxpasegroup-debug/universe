@@ -6,9 +6,11 @@ const card = {
   padding: "20px",
   borderRadius: "12px",
   cursor: "pointer",
-  border: "1px solid #222",
+  border: "1px solid #FFD700",
+  boxShadow: "0 0 12px rgba(255,215,0,0.25)",
   textAlign: "center",
   fontSize: "18px",
+  transition: "0.3s",
 };
 
 const contentCard = {
@@ -84,15 +86,30 @@ export default function Dashboard() {
       </div>
 
       <div style={{ display: "grid", gap: 15 }}>
-        <div style={card} onClick={() => router.push("/learn")}>
+        <div
+          style={card}
+          onClick={() => router.push("/learn")}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        >
           📘 Learn
         </div>
 
-        <div style={card} onClick={() => router.push("/earn")}>
+        <div
+          style={card}
+          onClick={() => router.push("/earn")}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        >
           💰 Earn
         </div>
 
-        <div style={card} onClick={() => window.open("https://wa.me/917591929909")}>
+        <div
+          style={card}
+          onClick={() => window.open("https://wa.me/917591929909")}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        >
           💬 Talk to Expert
         </div>
       </div>
