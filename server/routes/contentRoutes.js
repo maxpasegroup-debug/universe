@@ -4,12 +4,10 @@ const Content = require("../models/Content");
 
 router.get("/", async (req, res) => {
   try {
-    const { language, type } = req.query;
-    const filter = {};
-    if (language) filter.language = language;
-    if (type) filter.type = type;
+    const { language } = req.query;
 
-    const data = await Content.find(filter).sort({ createdAt: 1 });
+    const data = await Content.find({ language }).sort({ createdAt: 1 });
+
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });

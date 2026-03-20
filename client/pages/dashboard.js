@@ -35,9 +35,12 @@ export default function Dashboard() {
 
   const fetchContent = async (lang) => {
     try {
-      const res = await fetch(`/api/content?language=${encodeURIComponent(lang)}`);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/content?language=${lang}`
+      );
       const data = await res.json();
-      setContent(data || []);
+      console.log("CONTENT DATA:", data);
+      setContent(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
     }

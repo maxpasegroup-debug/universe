@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "";
+
 export default function Earn() {
   const [category, setCategory] = useState("");
   const [link, setLink] = useState("");
@@ -10,7 +12,7 @@ export default function Earn() {
   const save = async () => {
     if (!category) return alert("Category required");
 
-    await fetch("/api/content/upload", {
+    await fetch(`${API}/content/upload`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,11 +31,10 @@ export default function Earn() {
   };
 
   const fetchItems = async () => {
-    const res = await fetch(
-      `/api/content?language=${encodeURIComponent(language)}&type=earn`
-    );
+    const res = await fetch(`${API}/content?language=${language}`);
     const data = await res.json();
-    setItems(Array.isArray(data) ? data : []);
+    const list = Array.isArray(data) ? data.filter((x) => x.type === "earn") : [];
+    setItems(list);
   };
 
   useEffect(() => {
