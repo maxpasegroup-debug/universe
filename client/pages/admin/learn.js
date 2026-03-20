@@ -3,18 +3,25 @@ import { useState, useEffect } from "react";
 export default function Learn() {
   const [file, setFile] = useState(null);
   const [category, setCategory] = useState("");
+  const [language, setLanguage] = useState("English");
+  const [link, setLink] = useState("");
   const [items, setItems] = useState([]);
 
   const upload = async () => {
     if (!file || !category) return alert("Fill all fields");
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("category", category);
-
-    await fetch("/api/upload/learn", {
+    await fetch("/api/content/upload", {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        category,
+        type: "learn",
+        language,
+        link: link || "",
+        file: file?.name || "",
+      }),
     });
 
     alert("Uploaded");
@@ -22,14 +29,16 @@ export default function Learn() {
   };
 
   const fetchItems = async () => {
-    const res = await fetch("/api/learn");
+    const res = await fetch(
+      `/api/content?language=${encodeURIComponent(language)}&type=learn`
+    );
     const data = await res.json();
-    setItems(data);
+    setItems(Array.isArray(data) ? data : []);
   };
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [language]);
 
   return (
     <div
@@ -40,14 +49,36 @@ export default function Learn() {
         color: "#fff",
       }}
     >
-      <h1 style={{ color: "#FFD700" }}>?? Learn Manager</h1>
+      <h1 style={{ color: "#FFD700" }}>📘 Learn Manager</h1>
 
       <div style={{ marginBottom: 20 }}>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          style={{
+            padding: 10,
+            marginRight: 10,
+            background: "#111",
+            color: "#FFD700",
+            border: "1px solid #FFD700",
+          }}
+        >
+          <option>English</option>
+          <option>Malayalam</option>
+        </select>
+
         <input
           placeholder="Category (Eg: Step 1)"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           style={{ padding: 10, marginRight: 10 }}
+        />
+
+        <input
+          placeholder="Link (optional)"
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          style={{ padding: 10, marginRight: 10, width: "100%", maxWidth: 320 }}
         />
 
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
@@ -80,6 +111,13 @@ export default function Learn() {
         >
           <strong style={{ color: "#FFD700" }}>{item.category}</strong>
           <p>{item.file}</p>
+          {item.link ? (
+            <p>
+              <a href={item.link} target="_blank" rel="noreferrer" style={{ color: "#FFD700" }}>
+                Open link
+              </a>
+            </p>
+          ) : null}
         </div>
       ))}
     </div>

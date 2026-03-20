@@ -1,69 +1,122 @@
-import { useEffect, useState } from "react";
-import { getData } from "../src/utils/storage";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+
+const card = {
+  background: "#111",
+  padding: "20px",
+  borderRadius: "12px",
+  cursor: "pointer",
+  border: "1px solid #222",
+  textAlign: "center",
+  fontSize: "18px",
+};
+
+const contentCard = {
+  background: "#111",
+  padding: "15px",
+  marginTop: "10px",
+  borderRadius: "10px",
+  border: "1px solid #222",
+};
+
+const logoutBtn = {
+  marginTop: 30,
+  padding: "10px 20px",
+  background: "#FFD700",
+  border: "none",
+  cursor: "pointer",
+};
 
 export default function Dashboard() {
-  const [learn, setLearn] = useState([]);
-  const [earn, setEarn] = useState([]);
+  const router = useRouter();
+
+  const [language, setLanguage] = useState("English");
+  const [content, setContent] = useState([]);
+
+  const fetchContent = async (lang) => {
+    try {
+      const res = await fetch(`/api/content?language=${encodeURIComponent(lang)}`);
+      const data = await res.json();
+      setContent(data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    setLearn(getData("learn"));
-    setEarn(getData("earn"));
-  }, []);
+    const token = localStorage.getItem("token");
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (!token && !loggedIn) {
+      router.push("/login");
+      return;
+    }
+    fetchContent(language);
+  }, [language, router]);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>User Dashboard</h1>
+    <div
+      style={{
+        background: "#000",
+        minHeight: "100vh",
+        padding: "20px",
+        color: "#fff",
+      }}
+    >
+      <h1 style={{ color: "#FFD700" }}>✨ Your Dashboard</h1>
 
-      <h2>🚀 Learn</h2>
-
-      {learn.length === 0 && <p>No content added yet</p>}
-
-      {learn.map((item, i) => (
-        <div
-          key={i}
+      <div style={{ marginBottom: 20 }}>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
           style={{
-            border: "1px solid #ccc",
             padding: 10,
-            marginBottom: 10,
+            background: "#111",
+            color: "#FFD700",
+            border: "1px solid #FFD700",
           }}
         >
-          <h3>{item.category}</h3>
-          <p>{item.name}</p>
+          <option>English</option>
+          <option>Malayalam</option>
+        </select>
+      </div>
+
+      <div style={{ display: "grid", gap: 15 }}>
+        <div style={card} onClick={() => router.push("/learn")}>
+          📘 Learn
+        </div>
+
+        <div style={card} onClick={() => router.push("/earn")}>
+          💰 Earn
+        </div>
+
+        <div style={card} onClick={() => window.open("https://wa.me/917591929909")}>
+          💬 Talk to Expert
+        </div>
+      </div>
+
+      <h2 style={{ marginTop: 30 }}>📚 Your Steps</h2>
+
+      {content.map((item, i) => (
+        <div key={i} style={contentCard}>
+          <strong style={{ color: "#FFD700" }}>{item.category}</strong>
+          <p>{item.type}</p>
+
+          {item.link && (
+            <a href={item.link} target="_blank" rel="noreferrer" style={{ color: "#FFD700" }}>
+              Open Link
+            </a>
+          )}
+
+          {item.file && <p>📁 {item.file}</p>}
         </div>
       ))}
-
-      <h2>💰 Earn</h2>
-
-      {earn.length === 0 && <p>No content added yet</p>}
-
-      {earn.map((item, i) => (
-        <div
-          key={i}
-          style={{
-            border: "1px solid #ccc",
-            padding: 10,
-            marginBottom: 10,
-          }}
-        >
-          <h3>{item.category}</h3>
-          <p>{item.link || item.fileName}</p>
-        </div>
-      ))}
-
-      <h2>💬 Talk to Expert</h2>
-
-      <a href="https://wa.me/917591929909" target="_blank" rel="noreferrer">
-        Chat on WhatsApp
-      </a>
-
-      <br />
-      <br />
 
       <button
         onClick={() => {
           localStorage.clear();
-          window.location.href = "/login";
+          router.push("/login");
         }}
+        style={logoutBtn}
       >
         Logout
       </button>

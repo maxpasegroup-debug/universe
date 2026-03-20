@@ -1,12 +1,21 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
+const contentRoutes = require("./routes/contentRoutes");
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
-// CRITICAL: Railway health check
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || "mongodb://localhost:27017/7universe";
+
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB error:", err.message));
+
 app.get("/", (req, res) => {
   res.status(200).send("Backend LIVE 🚀");
 });
@@ -19,7 +28,6 @@ app.get("/api/test", (req, res) => {
   res.json({ message: "API working" });
 });
 
-// SIMPLE AUTH (for now)
 app.post("/api/auth/register", (req, res) => {
   res.json({ success: true });
 });
@@ -28,10 +36,10 @@ app.post("/api/auth/login", (req, res) => {
   res.json({ success: true });
 });
 
-// IMPORTANT: use Railway port
+app.use("/api/content", contentRoutes);
+
 const PORT = process.env.PORT || 8080;
 
-// CRITICAL: bind correctly
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

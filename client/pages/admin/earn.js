@@ -4,19 +4,24 @@ export default function Earn() {
   const [category, setCategory] = useState("");
   const [link, setLink] = useState("");
   const [file, setFile] = useState(null);
+  const [language, setLanguage] = useState("English");
   const [items, setItems] = useState([]);
 
   const save = async () => {
     if (!category) return alert("Category required");
 
-    const formData = new FormData();
-    formData.append("category", category);
-    formData.append("link", link);
-    if (file) formData.append("file", file);
-
-    await fetch("/api/upload/earn", {
+    await fetch("/api/content/upload", {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        category,
+        type: "earn",
+        language,
+        link: link || "",
+        file: file?.name || "",
+      }),
     });
 
     alert("Saved successfully");
@@ -24,14 +29,16 @@ export default function Earn() {
   };
 
   const fetchItems = async () => {
-    const res = await fetch("/api/earn");
+    const res = await fetch(
+      `/api/content?language=${encodeURIComponent(language)}&type=earn`
+    );
     const data = await res.json();
-    setItems(data);
+    setItems(Array.isArray(data) ? data : []);
   };
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [language]);
 
   return (
     <div
@@ -42,7 +49,7 @@ export default function Earn() {
         color: "#fff",
       }}
     >
-      <h1 style={{ color: "#FFD700" }}>?? Earn Manager</h1>
+      <h1 style={{ color: "#FFD700" }}>💰 Earn Manager</h1>
 
       <div
         style={{
@@ -52,6 +59,22 @@ export default function Earn() {
           marginBottom: 30,
         }}
       >
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          style={{
+            padding: 10,
+            marginBottom: 10,
+            background: "#111",
+            color: "#FFD700",
+            border: "1px solid #FFD700",
+            width: "100%",
+          }}
+        >
+          <option>English</option>
+          <option>Malayalam</option>
+        </select>
+
         <input
           placeholder="Category (Eg: Step 1)"
           value={category}
@@ -104,14 +127,14 @@ export default function Earn() {
 
           {item.link && (
             <p>
-              ??{" "}
+              🔗{" "}
               <a href={item.link} target="_blank" rel="noreferrer" style={{ color: "#FFD700" }}>
                 Open Link
               </a>
             </p>
           )}
 
-          {item.file && <p>?? {item.file}</p>}
+          {item.file && <p>📁 {item.file}</p>}
         </div>
       ))}
     </div>
